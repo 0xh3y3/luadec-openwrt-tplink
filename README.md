@@ -63,17 +63,23 @@ TP-Link BE6700 firmware **reorders the Lua 5.1 opcode table** (37 out of 38 opco
 shuffled). Before running `luadec` you must restore the original opcode order using `luaopswap`:
 
 ```bash
-# Step 1: generate opcode mapping using the firmware's own luac via QEMU
+# The opswap table for BE6700 V1.6 (fw 20251203) is already included in this repo.
+# No QEMU needed.
+
+# Restore opcodes then decompile
+./luadec/luaopswap -o /tmp/fixed.luac target.luac opswap-tables/BE6700_V1.6_20251203.txt
+./luadec/luadec /tmp/fixed.luac
+```
+
+If you need to generate a table for a **different firmware version** (QEMU required):
+
+```bash
+# Step 1: compile allopcodes.lua using the firmware's own luac via QEMU
 export SYSROOT=/path/to/squashfs-root
-cp /root/.agents/skills/luaopswap/allopcodes.lua /tmp/
-qemu-arm -L $SYSROOT $SYSROOT/usr/bin/luac -o /tmp/allopcodes_tplink.luac /tmp/allopcodes.lua
+qemu-arm -L $SYSROOT $SYSROOT/usr/bin/luac -o /tmp/allopcodes_fw.luac bin/allopcodes-5.1.lua
 
 # Step 2: generate swap table
-./luadec/luaopswap -gs /tmp/allopcodes_tplink.luac > /tmp/tplink_opswap.txt
-
-# Step 3: restore opcodes then decompile
-./luadec/luaopswap -o /tmp/fixed.luac target.luac /tmp/tplink_opswap.txt
-./luadec/luadec /tmp/fixed.luac
+./luadec/luaopswap -gs /tmp/allopcodes_fw.luac > opswap-tables/<device>_<version>.txt
 ```
 
 ---
