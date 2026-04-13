@@ -61,10 +61,10 @@ $(LUA_SO): $(CORE_O) $(LIB_O)
 	ln -fs $@.$(PKG_VERSION) $@
 
 $(LUA_T): $(LUA_O) $(LUA_SO)
-	$(CC) -o $@ -L. -llua $(MYLDFLAGS) $(LUA_O) $(LIBS)
+	$(CC) -o $@ -L. $(MYLDFLAGS) $(LUA_O) -llua $(LIBS)
 
 $(LUAC_T): $(LUAC_O) $(LUA_SO)
-	$(CC) -o $@ -L. -llua $(MYLDFLAGS) $(LUAC_O) $(LIBS)
+	$(CC) -o $@ -L. $(MYLDFLAGS) $(LUAC_O) -llua $(LIBS)
 
 $(LUAC_T)-host: $(LUAC_O) $(LUA_A)
 	$(CC) -o $@ $(MYLDFLAGS) $(LUAC_O) $(LUA_A) $(LIBS)

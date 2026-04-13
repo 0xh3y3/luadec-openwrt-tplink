@@ -73,9 +73,17 @@ static lua_Number LoadNumber(LoadState* S)
  return x;
 }
 
+/* OpenWrt patch: integer type support */
+static lua_Integer LoadInteger(LoadState* S)
+{
+ lua_Integer x;
+ LoadVar(S,x);
+ return x;
+}
+
 static TString* LoadString(LoadState* S)
 {
- size_t size;
+ unsigned int size; /* OpenWrt patch: use unsigned int (4 bytes) not size_t (8 bytes on x86_64) */
  LoadVar(S,size);
  if (size==0)
   return NULL;
@@ -118,6 +126,9 @@ static void LoadConstants(LoadState* S, Proto* f)
 	break;
    case LUA_TNUMBER:
 	setnvalue(o,LoadNumber(S));
+	break;
+   case LUA_TINT: /* OpenWrt patch: integer constant type */
+	setivalue(o,LoadInteger(S));
 	break;
    case LUA_TSTRING:
 	setsvalue2n(S->L,o,LoadString(S));
@@ -220,8 +231,8 @@ void luaU_header (char* h)
  *h++=(char)LUAC_FORMAT;
  *h++=(char)*(char*)&x;				/* endianness */
  *h++=(char)sizeof(int);
- *h++=(char)sizeof(size_t);
+ *h++=(char)sizeof(unsigned int); /* OpenWrt patch: uses unsigned int, not size_t (ARM32=4, not 8) */
  *h++=(char)sizeof(Instruction);
  *h++=(char)sizeof(lua_Number);
- *h++=(char)(((lua_Number)0.5)==0);		/* is lua_Number integral? */
+ *h++=(char)sizeof(int); /* OpenWrt patch: lua_Integer size, not integral flag */
 }

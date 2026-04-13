@@ -5,8 +5,8 @@ LUASRC=../lua-$(LUAVER)/src
 LIBDIR=$(LUASRC)
 BINDIR=../bin
 
-LUA= $(LUASRC)/lua
-LUAC= $(LUASRC)/luac
+LUA= LD_LIBRARY_PATH=$(LUASRC) $(LUASRC)/lua
+LUAC= LD_LIBRARY_PATH=$(LUASRC) $(LUASRC)/luac
 BIN2C = $(LUA) $(BINDIR)/bin2c.lua
 
 DEV_NULL= /dev/null
